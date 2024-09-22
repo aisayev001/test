@@ -1,8 +1,8 @@
 $(document).ready(function () {
-    // Ensure the Tableau Extensions API is initialized before usage
+    // Ensure the Tableau Extensions API is initialized before using it
     tableau.extensions.initializeAsync().then(function () {
         console.log("Tableau extension initialized.");
-
+        
         // Bind the button click event to load data
         $('#downloadButton').click(function () {
             loadDataAndDownload();
