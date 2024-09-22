@@ -1,13 +1,20 @@
 $(document).ready(function () {
-    // Bind the button click event to load data
-    $('#downloadButton').click(function () {
-        loadDataAndDownload();
+    // Ensure the Tableau Extensions API is initialized before usage
+    tableau.extensions.initializeAsync().then(function () {
+        console.log("Tableau extension initialized.");
+
+        // Bind the button click event to load data
+        $('#downloadButton').click(function () {
+            loadDataAndDownload();
+        });
+    }).catch(function (err) {
+        console.error("Error initializing Tableau extension: ", err);
     });
 });
 
 function loadDataAndDownload() {
     tableau.extensions.initializeAsync().then(function () {
-        console.log("Extension initialized. Fetching data...");
+        console.log("Fetching data...");
 
         const dashboard = tableau.extensions.dashboardContent.dashboard;
         const worksheets = dashboard.worksheets;
