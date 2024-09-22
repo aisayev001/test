@@ -1,41 +1,36 @@
 $(document).ready(function () {
-    tableau.extensions.initializeAsync().then(function () {
-        console.log("Extension initialized. Fetching data...");
+    // Bind the button click event to load data
+    $('#downloadButton').click(function () {
         loadDataAndDownload();
-    }).catch(function (err) {
-        console.error("Error initializing Tableau extension: ", err);
     });
 });
 
-// Function to load data from all worksheets and download it as a CSV
 function loadDataAndDownload() {
-    // Get all the worksheets in the dashboard
-    const dashboard = tableau.extensions.dashboardContent.dashboard;
-    const worksheets = dashboard.worksheets;
+    tableau.extensions.initializeAsync().then(function () {
+        console.log("Extension initialized. Fetching data...");
 
-    worksheets.forEach(worksheet => {
-        // Get underlying data for each worksheet
-        worksheet.getUnderlyingDataAsync().then(dataTable => {
-            const csvData = convertToCSV(dataTable);
-            // Download the data as CSV
-            downloadCSV(csvData, worksheet.name);
-        }).catch(err => {
-            console.error("Error fetching data from worksheet: ", worksheet.name, err);
+        const dashboard = tableau.extensions.dashboardContent.dashboard;
+        const worksheets = dashboard.worksheets;
+
+        worksheets.forEach(worksheet => {
+            worksheet.getUnderlyingDataAsync().then(dataTable => {
+                const csvData = convertToCSV(dataTable);
+                downloadCSV(csvData, worksheet.name);
+            }).catch(err => {
+                console.error("Error fetching data from worksheet:", worksheet.name, err);
+            });
         });
+    }).catch(function (err) {
+        console.error("Error initializing Tableau extension:", err);
     });
 }
 
-// Helper function to convert Tableau DataTable to CSV format
 function convertToCSV(dataTable) {
     const fieldNames = dataTable.columns.map(col => col.fieldName);
     const dataRows = dataTable.data.map(row => row.map(cell => cell.value));
-
-    // Create CSV content as string
-    const csvContent = [fieldNames, ...dataRows].map(row => row.join(",")).join("\n");
-    return csvContent;
+    return [fieldNames, ...dataRows].map(row => row.join(",")).join("\n");
 }
 
-// Helper function to trigger CSV download
 function downloadCSV(csvData, worksheetName) {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
